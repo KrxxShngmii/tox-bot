@@ -19,10 +19,9 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-keep_alive() # Запуск веб-сервера перед ботом
+keep_alive() 
 # ----------------------------------------------
 
-# Берем токены из настроек Render (Environment Variables)
 TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 HF_TOKEN = os.environ.get("AI_API_KEY")
 
@@ -47,12 +46,12 @@ def chat_reply(message):
         
     user_histories[chat_id].append({"role": "user", "content": message.text})
     
-    if len(user_histories[chat_id]) > 12:
-        user_histories[chat_id] = [user_histories[chat_id][0]] + user_histories[chat_id][-10:]
+    if len(user_histories[chat_id]) > 10:
+        user_histories[chat_id] = [user_histories[chat_id][0]] + user_histories[chat_id][-8:]
 
     try:
         response = client.chat_completion(messages=user_histories[chat_id], max_tokens=500)
-        bot_text = response.choices[0].message.content # Исправил небольшую опечатку библиотеки
+        bot_text = response.choices.message.content
         
         user_histories[chat_id].append({"role": "assistant", "content": bot_text})
         bot.reply_to(message, bot_text)
