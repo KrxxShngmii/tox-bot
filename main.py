@@ -44,17 +44,12 @@ def chat_reply(message):
     if chat_id not in user_histories:
         user_histories[chat_id] = [{"role": "system", "content": CHARACTER_PROMPT}]
         
-    # Добавляем сообщение пользователя
     user_histories[chat_id].append({"role": "user", "content": message.text})
-    
-    # ИСПРАВЛЕНО: Безопасное ограничение памяти без изменения структуры
-    if len(user_histories[chat_id]) > 10:
-        # Оставляем системный промпт (индекс 0) и последние 8 сообщений
-        user_histories[chat_id] = [user_histories[chat_id][0]] + user_histories[chat_id][-8:]
 
     try:
-        response = client.chat_completion(messages=user_histories[chat_id], max_tokens=500)
-        bot_text = response.choices[message].content
+        # Прямой запрос к ИИ без кривой обрезки истории
+        response = client.chat_completion(messages=user_histories[chat_id], max_tokens=200)
+        bot_text = response.choices[0].message.content
         
         user_histories[chat_id].append({"role": "assistant", "content": bot_text})
         bot.reply_to(message, bot_text)
